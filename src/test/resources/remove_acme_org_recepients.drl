@@ -1,0 +1,10 @@
+package com.sample
+
+import com.sample.Example.Message;
+
+rule "Remove all ACME"
+    when
+        m : Mail( m.containsRecepientsFromOrg("ACME"))
+    then
+        m.removeRecpeientsForOrg("ACME");
+end                                                      g

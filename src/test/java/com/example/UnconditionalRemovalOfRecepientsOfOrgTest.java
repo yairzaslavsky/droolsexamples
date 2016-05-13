@@ -16,7 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 
-public class DroolsTest {
+public class UnconditionalRemovalOfRecepientsOfOrgTest {
 
     private Example.Message helloMessage;
 
@@ -29,7 +29,7 @@ public class DroolsTest {
     }
 
     @Test
-    public void shouldMeow() throws IOException, DroolsParserException {
+    public void shouldRemoveRecepientsOfAcme() throws IOException, DroolsParserException {
         Engine engine = new Engine();
         WorkingMemory session = engine.createRulesSessionFromResource("/remove_acme_org_recepients.drl");
         Mail mail = new Mail();
