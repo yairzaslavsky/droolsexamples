@@ -4,7 +4,7 @@ import com.sample.Example.Message;
 
 rule "Remove all ACME"
     when
-        m : Mail( m.containsRecepientsFromOrg("ACME"))
+        m : Mail( m.containsRecepientsFromOrg("ACME") && mailType == MailType.RFI)
     then
         m.removeRecpeientsForOrg("ACME");
 end

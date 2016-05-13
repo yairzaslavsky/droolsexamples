@@ -8,7 +8,6 @@ import static org.hamcrest.core.Is.is;
 import java.io.IOException;
 
 import com.aconex.rules.Engine;
-import com.sample.Example;
 import com.sample.Mail;
 import org.drools.WorkingMemory;
 import org.drools.compiler.DroolsParserException;
@@ -18,7 +17,6 @@ import org.junit.Test;
 
 public class UnconditionalRemovalOfRecepientsOfOrgTest {
 
-    private Example.Message helloMessage;
 
     @BeforeClass
     public static void before() {

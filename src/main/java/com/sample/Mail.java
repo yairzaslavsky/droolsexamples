@@ -7,6 +7,7 @@ import java.util.List;
 public class Mail {
 
     private List<String> recepients = new ArrayList<String>();
+    private MailType mailType = MailType.GENERAL;
 
     public List<String> getRecepients() {
         return recepients;
@@ -40,6 +41,7 @@ public class Mail {
 
 
     public void removeRecpeientsForOrg(String orgName) {
+        System.out.println("removing!");
         Iterator<String> iterator = recepients.iterator();
         while (iterator.hasNext()) {
             String recepient = iterator.next();
@@ -47,5 +49,13 @@ public class Mail {
                 iterator.remove();
             }
         }
+    }
+
+    public MailType getMailType() {
+        return mailType;
+    }
+
+    public void setMailType(MailType mailType) {
+        this.mailType = mailType;
     }
 }
