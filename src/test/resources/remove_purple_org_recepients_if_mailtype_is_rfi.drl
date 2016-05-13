@@ -1,0 +1,8 @@
+package com.sample
+
+rule "Remove all PURPLE if mailtype is RFI"
+    when
+        m : Mail( mailType == MailType.RFI && m.containsRecepientsFromOrg("PURPLE"))
+    then
+        m.removeRecpeientsForOrg("PURPLE");
+end
