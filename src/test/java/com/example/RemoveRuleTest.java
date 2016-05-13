@@ -26,7 +26,7 @@ public class RemoveRuleTest {
     }
 
     @Test
-    public void foo() throws IOException, DroolsParserException {
+    public void shouldNotRemoveRecepientsIfRuleIsRemoved() throws IOException, DroolsParserException {
         mail = new Mail();
         mail.addRecepient("Yair");
         mail.addRecepient("Yanhui");
@@ -42,7 +42,6 @@ public class RemoveRuleTest {
         mail.addRecepient("Yair");
         mail.addRecepient("Yanhui");
         mail.addRecepient("Dmitriy");
-        engine = new Engine();
         session.fireAllRules();
         assertThat(mail.getRecepients().size() == 3, is(true));
 
