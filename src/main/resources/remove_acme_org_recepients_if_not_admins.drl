@@ -1,0 +1,13 @@
+package com.sample
+
+import com.sample.Mail
+import com.sample.OrganizationsHelper;
+import com.sample.RolesHelper;
+
+rule "Remove all ACME if not Admin"
+    when
+        $m: Mail()
+        $r: String( OrganizationsHelper.isMemberOfOrg($r, "ACME") && !RolesHelper.isOfRole($r, "Admin") ) from $m.recepients;
+    then
+        $m.removeRecepient($r);
+end
