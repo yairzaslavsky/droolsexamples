@@ -35,6 +35,10 @@ public class Engine {
         session.insert(object);
     }
 
+    public void removeRuleFromSession(WorkingMemory session, String javaPkgName, String ruleName) {
+        session.getRuleBase().removeRule(javaPkgName, ruleName);
+    }
+
 
     private Reader getRuleFileAsReader(String ruleFile) {
         InputStream resourceAsStream = getClass().getResourceAsStream(ruleFile);
