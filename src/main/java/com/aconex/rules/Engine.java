@@ -12,39 +12,60 @@ import org.drools.compiler.DroolsError;
 import org.drools.compiler.DroolsParserException;
 import org.drools.compiler.PackageBuilder;
 import org.drools.compiler.PackageBuilderErrors;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieRepository;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 
 public class Engine {
 
 
-    public WorkingMemory createRulesSession(InputStream rulesDataStream) throws IOException, DroolsParserException {
+    public KieSession createRulesSession(InputStream rulesDataStream)  {
 
-        InputStreamReader reader = new InputStreamReader(rulesDataStream);
-        PackageBuilder builder = new PackageBuilder();
-        builder.addPackageFromDrl(reader);
-        RuleBase ruleBase = addRulesToWorkingMemory(builder);
-        WorkingMemory workingMemory = ruleBase.newStatefulSession();
-        return workingMemory;
+        KieServices kieServices = KieServices.Factory.get();
+
+        KieFileSystem fileSystem = kieServices.newKieFileSystem();
+        writeInputStreamToFileSystem(rulesDataStream, kieServices, fileSystem);
+        KieBuilder builder = kieServices.newKieBuilder(fileSystem);
+        builder.buildAll();
+
+        if (builder.getResults().hasMessages(org.kie.api.builder.Message.Level.ERROR)) {
+            throw new RuntimeException("Build time Errors: " + builder.getResults().toString());
+        }
+
+        KieContainer kContainer = kieServices.newKieContainer(kieServices.getRepository().getDefaultReleaseId());
+        KieSession session = kContainer.newKieSession();
+        return session;
     }
 
-    public WorkingMemory createRulesSessionFromResource(String resourceName) throws IOException, DroolsParserException {
+    public KieSession createRulesSessionFromResource(String resourceName) throws IOException {
         return createRulesSession(this.getClass().getResourceAsStream(resourceName));
 
     }
 
-    public <T> void attachObjectToSession(WorkingMemory session, T object) {
+    public <T> void attachObjectToSession(KieSession session, T object) {
         session.insert(object);
     }
 
-    public WorkingMemory removeRuleFromSession(WorkingMemory session, String pkgName, String ruleName) {
-        session.getRuleBase().removeRule(pkgName, ruleName);
-        return session.getRuleBase().newStatefulSession();
+    public KieSession removeRuleFromSession(KieSession session, String pkgName, String ruleName) {
+        session.getKieBase().removeRule(pkgName, ruleName);
+        return session.getKieBase().newKieSession();
     }
 
-    public WorkingMemory addRuleToSessionFromResource(WorkingMemory session, String resourceName) throws IOException, DroolsParserException {
+    public WorkingMemory addRuleToSessionFromResource(WorkingMemory session, String resourceName)  {
         return addRuleToSession(session, this.getClass().getResourceAsStream(resourceName));
     }
 
-    public WorkingMemory addRuleToSession(WorkingMemory session,  InputStream rulesDataStream) throws IOException, DroolsParserException {
+    public WorkingMemory addRuleToSession(KieSession session,  InputStream rulesDataStream)  {
+
+        KieBuilder builder = createBuilder();
+        KieFileSystem fileSystem =  KieServices.Factory.get().newKieFileSystem();
+
+        builder.
 
         PackageBuilder builder = new PackageBuilder();
         InputStreamReader reader = new InputStreamReader(rulesDataStream);
@@ -90,6 +111,18 @@ public class Engine {
 
             throw new IllegalArgumentException(errorMessages.toString());
         }
+    }
+
+    private void writeInputStreamToFileSystem(InputStream rulesDataStream, KieServices kieServices, KieFileSystem fileSystem) {
+        Resource resource = kieServices.getResources().newInputStreamResource(rulesDataStream).setResourceType(ResourceType.DRL);
+        fileSystem.write(resource);
+    }
+
+
+    private KieBuilder createBuilder() {
+        KieServices kieServices = KieServices.Factory.get();
+        KieFileSystem fileSystem = kieServices.newKieFileSystem();
+        return kieServices.newKieBuilder(fileSystem);
     }
 
 }
