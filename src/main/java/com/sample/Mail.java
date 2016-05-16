@@ -41,7 +41,6 @@ public class Mail {
 
 
     public void removeRecpeientsForOrg(String orgName) {
-        System.out.println("removing!");
         Iterator<String> iterator = recepients.iterator();
         while (iterator.hasNext()) {
             String recepient = iterator.next();

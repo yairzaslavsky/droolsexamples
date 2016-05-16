@@ -1,0 +1,16 @@
+package com.sample
+
+
+rule "Remove all ACME"
+    when
+        m : Mail( m.containsRecepientsFromOrg("ACME"))
+    then
+        m.removeRecpeientsForOrg("ACME");
+end
+
+rule "Remove all PURPLE if mailtype is RFI"
+    when
+        m : Mail( m.containsRecepientsFromOrg("PURPLE") && mailType == MailType.RFI)
+    then
+        m.removeRecpeientsForOrg("PURPLE");
+end

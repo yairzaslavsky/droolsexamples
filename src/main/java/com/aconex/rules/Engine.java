@@ -12,7 +12,6 @@ import org.drools.compiler.DroolsError;
 import org.drools.compiler.DroolsParserException;
 import org.drools.compiler.PackageBuilder;
 import org.drools.compiler.PackageBuilderErrors;
-import org.drools.rule.Rule;
 
 public class Engine {
 
@@ -41,18 +40,23 @@ public class Engine {
         return session.getRuleBase().newStatefulSession();
     }
 
-    public WorkingMemory addRuleToSessionFromResource(WorkingMemory session, String resourceName, String pkgName, String ruleName) throws IOException, DroolsParserException {
-        return addRuleToSession(session, pkgName, ruleName, this.getClass().getResourceAsStream(resourceName));
+    public WorkingMemory addRuleToSessionFromResource(WorkingMemory session, String resourceName) throws IOException, DroolsParserException {
+        return addRuleToSession(session, this.getClass().getResourceAsStream(resourceName));
     }
 
-    public WorkingMemory addRuleToSession(WorkingMemory session, String pkgName, String ruleName, InputStream rulesDataStream) throws IOException, DroolsParserException {
+    public WorkingMemory addRuleToSession(WorkingMemory session,  InputStream rulesDataStream) throws IOException, DroolsParserException {
 
         PackageBuilder builder = new PackageBuilder();
         InputStreamReader reader = new InputStreamReader(rulesDataStream);
         builder.addPackageFromDrl(reader);
-        Rule rule = builder.getPackage().getRule(ruleName);
-        session.getRuleBase().getPackage(pkgName).addRule(rule);
-        return session.getRuleBase().newStatefulSession();
+        for (org.drools.rule.Package currentPkg :session.getRuleBase().getPackages()) {
+            builder.addPackage(currentPkg);
+        }
+        RuleBase ruleBase = RuleBaseFactory.newRuleBase();
+        for (org.drools.rule.Package currentPackage: builder.getPackages()) {
+            ruleBase.addPackage(currentPackage);
+        }
+        return ruleBase.newStatefulSession();
     }
 
 

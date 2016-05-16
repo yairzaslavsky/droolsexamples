@@ -11,7 +11,6 @@ import com.sample.Mail;
 import com.sample.MailType;
 import org.drools.WorkingMemory;
 import org.drools.compiler.DroolsParserException;
-import org.drools.rule.Package;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -31,32 +30,13 @@ public class AddRuleTest {
     public void shoulRemoveAllUsersAfterTwoRulesAreAdded() throws IOException, DroolsParserException {
         createMailWithRecepients();
 
-        //Activate first rule, removal of 2 acme users
         engine = new Engine();
         WorkingMemory session = engine.createRulesSessionFromResource("/remove_acme_org_recepients.drl");
-        engine.attachObjectToSession(session, mail);
-        session.fireAllRules();
-        assertThat(mail.getRecepients().size() < 3, is(true));
-
-        //Activate first rule, removal of no user (mail type is not RFI)
-
-        createMailWithRecepients();
-        session = engine.addRuleToSessionFromResource(session, "/remove_purple_org_recepients_if_mailtype_is_rfi.drl", "com.sample", "Remove all PURPLE if mailtype is RFI");
-        session.fireAllRules();
-        assertThat(mail.getRecepients().size() ,is(3));
-
-        createMailWithRecepients();
-        //Activate all rules , no recepients should exist
-        Package pkg = session.getRuleBase().getPackages()[0];
-        System.out.println("rules number " + pkg.getRules().length);
+        session = engine.addRuleToSessionFromResource(session, "/remove_purple_org_recepients_if_mailtype_is_rfi.drl");
         mail.setMailType(MailType.RFI);
         engine.attachObjectToSession(session, mail);
         session.fireAllRules();
-        System.out.println(mail.getRecepients().get(0));
-        assertThat(mail.getRecepients().size() ,is(0));
-
-
-
+        assertThat(mail.getRecepients().size() , is(0));
     }
 
     private void createMailWithRecepients() {
